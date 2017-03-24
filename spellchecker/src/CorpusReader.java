@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class CorpusReader 
@@ -112,10 +113,31 @@ public class CorpusReader
             throw new IllegalArgumentException("NGram must be non-empty.");
         }
         
-        double smoothedCount = 0.0;
+        double smoothedCount;
         
-        /** ADD CODE HERE **/  
+        /** ADD CODE HERE **/
+        if(!NGram.contains(" ")) { //unigram
+            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (totalCount() + getVocabularySize()) * totalCount(); // to get count multiply by totalCount() or N = number of tokens
+        }
+        else { //bigram
+            String s1;
+            int j = NGram.indexOf(" ");
+
+            s1 = NGram.substring(0, j);
+            smoothedCount = ((double)(getNGramCount(NGram) + 1)) / (getNGramCount(s1) + getVocabularySize()) * getNGramCount(s1); // to get count multiply by getNGramCount(s1)
+                                                         //possibly use getSmoothedCount(s1)                                    here too maybe
+        }        
         
         return smoothedCount;        
+    }
+    public int totalCount() {
+        int totalCount = 0;
+        
+        for(Map.Entry<String, Integer> entry: ngrams.entrySet()) {
+            if(!entry.getKey().contains(" ")) {
+                totalCount = totalCount + entry.getValue();
+            }
+        }
+        return totalCount;
     }
 }

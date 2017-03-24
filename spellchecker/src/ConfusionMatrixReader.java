@@ -33,6 +33,9 @@ public class ConfusionMatrixReader {
     {
         return confusionMatrix.getOrDefault(error+"|"+correct,0);
     }
+    public int getCountMatrixValue(String error) {
+        return countMatrix.get(error);
+    }
     
     private void readConfusionMatrix() 
             throws FileNotFoundException, IOException

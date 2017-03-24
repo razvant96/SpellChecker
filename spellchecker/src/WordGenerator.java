@@ -22,7 +22,11 @@ public class WordGenerator {
      */
     private double probability(String t, String c) {
         // ToDo SpellChecker Assignment: Implement this!
-        return 1.0;
+        if(cmr.getConfusionCount(t, c) == 0) {
+            return 0;
+        }
+        double prob = ((double)cmr.getConfusionCount(t, c)) / cmr.getCountMatrixValue(t);
+        return prob;
     }
     
     protected void addInsertions(HashMap<String, Double> result, String typo) {
