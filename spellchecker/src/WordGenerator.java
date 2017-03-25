@@ -25,7 +25,7 @@ public class WordGenerator {
         if(cmr.getConfusionCount(t, c) == 0) {
             return 0;
         }
-        double prob = ((double)cmr.getConfusionCount(t, c)) / cmr.getCountMatrixValue(t);
+        double prob = ((double) cmr.getConfusionCount(t, c)) / cmr.getCountMatrixValue(t);
         return prob;
     }
     

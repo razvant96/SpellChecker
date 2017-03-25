@@ -124,7 +124,7 @@ public class CorpusReader
             int j = NGram.indexOf(" ");
 
             s1 = NGram.substring(0, j);
-            smoothedCount = ((double)(getNGramCount(NGram) + 1)) / (getNGramCount(s1) + getVocabularySize()) * getNGramCount(s1); // to get count multiply by getNGramCount(s1)
+            smoothedCount = ((double)(getNGramCount(NGram) + 1)) / (getSmoothedCount(s1) + getVocabularySize()) * getSmoothedCount(s1); // to get count multiply by getNGramCount(s1)
                                                          //possibly use getSmoothedCount(s1)                                    here too maybe
         }        
         
