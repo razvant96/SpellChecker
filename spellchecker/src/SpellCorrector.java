@@ -17,7 +17,7 @@ public class SpellCorrector {
         {
             throw new IllegalArgumentException("phrase must be non-empty.");
         }
-        phrase = "SoS " + phrase;
+        phrase = "SoS " + phrase + " EoS";
             
         String[] words = phrase.split(" ");
         String finalSuggestion = "";
@@ -25,7 +25,7 @@ public class SpellCorrector {
         
         int nrOfMistakes = 0;
         int i;
-        for(i = 1; i < words.length; i++) {
+        for(i = 1; i < words.length - 1; i++) {
             if(nrOfMistakes == 2) {
                 break;
             }
@@ -33,12 +33,13 @@ public class SpellCorrector {
             double maxProbability = (double) Double.NEGATIVE_INFINITY;
             String correctWord = "";
             if(cr.inVocabulary(words[i])) {
-                canditateWords.put(words[i], 1.0);
+                canditateWords.put(words[i], 0.95);
             }
             //System.out.println(canditateWords);
             
             for(Map.Entry<String,Double> entry : canditateWords.entrySet()){
-                double prior = Math.log10(cr.getSmoothedCount(words[i-1] + " " + entry.getKey()) / cr.getSmoothedCount(words[i-1]));
+                double prior = Math.log10((cr.getSmoothedCount(words[i-1] + " " + entry.getKey()) / cr.getSmoothedCount(words[i-1]))
+                                            * (cr.getSmoothedCount(entry.getKey() + " " + words[i+1]) / cr.getSmoothedCount(entry.getKey())));
                 double channel = Math.log10(entry.getValue());
                 double probability = channel + prior;
                 System.out.println(probability + " " + entry.getKey() + " " + words[i- 1] + " " + channel + " " + prior);
@@ -49,20 +50,16 @@ public class SpellCorrector {
                 }
             }
             
-            if(maxProbability < Math.log10(cr.getSmoothedCount(words[i]) / cr.totalCount()) / Math.log10(2)) {
-                correctWord = words[i];
-            }
-            
             finalSuggestion = finalSuggestion + " " + correctWord;
             if(!correctWord.equals(words[i])) {
                 nrOfMistakes++;
-                if(i < words.length - 1) {
+                if(i < words.length - 2) {
                     finalSuggestion = finalSuggestion + " " + words[i + 1];
                 }
                 i++;
             }
         }
-        for(int k = i; k < words.length; k++) {
+        for(int k = i; k < words.length - 1; k++) {
             finalSuggestion = finalSuggestion + " " + words[k];
         }
         return finalSuggestion.trim();

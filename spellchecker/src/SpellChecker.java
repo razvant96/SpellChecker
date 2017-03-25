@@ -27,8 +27,8 @@ public class SpellChecker {
     
     static void nonPeachTest(SpellCorrector sc) throws IOException { 
             String[] sentences = {
-                "at the hme locations there were traces of water",
-                //"this assay allowed us to measure a wide variety of conitions"
+                //"at the hme locations there were traces of water",
+                "this assay allowed us to measure a wide variety of conitions"
             };
             
             for(String sentence: sentences) {
