@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class CorpusReader 
@@ -15,6 +14,11 @@ public class CorpusReader
     
     private HashMap<String,Integer> ngrams;
     private Set<String> vocabulary;
+    private HashMap<String, Integer> biChars;  // keeps count of occurences of two characters xy in the whole corpus
+    private int corpusSize;
+    private int biGramCount;
+    private HashMap<String,Integer> biGram2; // count 2nd word in biGram
+    private HashMap<String,Integer> biGram1; // count first word in biGram
         
     public CorpusReader() throws IOException
     {  
@@ -28,7 +32,7 @@ public class CorpusReader
      * @param nGram : space-separated list of words, e.g. "adopted by him"
      * @return count of <NGram> in corpus
      */
-     public int getNGramCount(String nGram) throws  NumberFormatException
+     public int getNGramCount(String nGram) throws  IllegalArgumentException
     {
         if(nGram == null || nGram.length() == 0)
         {
@@ -41,6 +45,11 @@ public class CorpusReader
             FileNotFoundException, IOException, NumberFormatException
     {
         ngrams = new HashMap<>();
+        biChars = new HashMap<>();
+        biGram1 = new HashMap<>();
+        biGram2 = new HashMap<>();
+        corpusSize=0;
+        biGramCount = 0;
 
         FileInputStream fis;
         fis = new FileInputStream(CNTFILE_LOC);
@@ -48,22 +57,43 @@ public class CorpusReader
 
         while (in.ready()) {
             String phrase = in.readLine().trim();
-            String s1, s2;
             int j = phrase.indexOf(" ");
-
-            s1 = phrase.substring(0, j);
-            s2 = phrase.substring(j + 1, phrase.length());
-
-            int count = 0;
+            String s1 = phrase.substring(0, j);
+            String s2 = phrase.substring(j + 1, phrase.length());
+            
             try {
-                count = Integer.parseInt(s1);
+                int count = Integer.parseInt(s1);
                 ngrams.put(s2, count);
+                if (!s2.contains(" ")) { // unigram
+                    corpusSize += count;
+                    addBiChars(s2,count);
+                } else {
+                    int space = s2.indexOf(' ');
+                    String w1 = s2.substring(0,space);
+                    String w2 = s2.substring(space+1);
+                    
+                    biGram1.put(w1, biGram1.getOrDefault(w1, 0)+1);
+                    biGram2.put(w2, biGram2.getOrDefault(w2, 0)+1);
+                    
+                    biGramCount++;
+                }
             } catch (NumberFormatException nfe) {
                 throw new NumberFormatException("NumberformatError: " + s1);
             }
         }
     }
     
+    private void addBiChars(String word, int count) {
+        word = " "+word;
+        for(int i=0;i<word.length();i++) {
+            if (i<word.length()-1) {
+                String bichar = word.substring(i,i+2);
+                biChars.put(bichar, count + biChars.getOrDefault(bichar,0));
+            }
+            String uniChar = word.substring(i,i+1);
+            biChars.put(uniChar, count + biChars.getOrDefault(uniChar,0));
+        }
+    }
     
     private void readVocabulary() throws FileNotFoundException, IOException {
         vocabulary = new HashSet<>();
@@ -79,9 +109,9 @@ public class CorpusReader
     }
     
     /**
-     * Returns the size of the number of unique words in the corpus
+     * Returns the number of unique words in the corpus
      * 
-     * @return the size of the number of unique words in the corpus
+     * @return the number of unique words in the corpus
      */
     public int getVocabularySize() 
     {
@@ -89,10 +119,19 @@ public class CorpusReader
     }
     
     /**
-     * Returns the subset of words in set that are in the vocabulary
+     * Returns the number of words in the corpus.
+     * This is counted using the sum of all unigram counts.
+     */
+    public int getCorpusSize() 
+    {
+        return corpusSize;
+    }
+       
+    /**
+     * Returns a subset of words in set that are also in the vocabulary
      * 
      * @param set
-     * @return 
+     * @return intersection of set and vocabulary
      */
     public HashSet<String> inVocabulary(Set<String> set) 
     {
@@ -101,6 +140,11 @@ public class CorpusReader
         return h;
     }
     
+    /**
+     * Returns whether or not word appears in the vocabulary.
+     * @param word
+     * @return 
+     */
     public boolean inVocabulary(String word) 
     {
        return vocabulary.contains(word);
@@ -113,31 +157,22 @@ public class CorpusReader
             throw new IllegalArgumentException("NGram must be non-empty.");
         }
         
-        double smoothedCount;
+        double smoothedCount = 0.0;
         
-        /** ADD CODE HERE **/
         if(!NGram.contains(" ")) { //unigram
-            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (totalCount() + getVocabularySize()) * totalCount(); // to get count multiply by totalCount() or N = number of tokens
+            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (getCorpusSize() + getVocabularySize()) * getCorpusSize(); 
+            // to get count multiply by getCorpusSize() or N = number of tokens
         }
         else { //bigram
             String s1;
             int j = NGram.indexOf(" ");
 
             s1 = NGram.substring(0, j);
-            smoothedCount = ((double)(getNGramCount(NGram) + 1)) / (getSmoothedCount(s1) + getVocabularySize()) * getSmoothedCount(s1); // to get count multiply by getNGramCount(s1)
-                                                         //possibly use getSmoothedCount(s1)                                    here too maybe
-        }        
+            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (getSmoothedCount(s1) + getVocabularySize()) * getSmoothedCount(s1); 
+                                                                            // to get count multiply by getNGramCount(s1)
+                                                         //possibly use getSmoothedCount(s1)                               here too maybe
+        }
         
         return smoothedCount;        
-    }
-    public int totalCount() {
-        int totalCount = 0;
-        
-        for(Map.Entry<String, Integer> entry: ngrams.entrySet()) {
-            if(!entry.getKey().contains(" ")) {
-                totalCount = totalCount + entry.getValue();
-            }
-        }
-        return totalCount;
     }
 }

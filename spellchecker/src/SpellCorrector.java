@@ -33,7 +33,7 @@ public class SpellCorrector {
             double maxProbability = (double) Double.NEGATIVE_INFINITY;
             String correctWord = "";
             if(cr.inVocabulary(words[i])) {
-                canditateWords.put(words[i], 0.95);
+                canditateWords.put(words[i], 0.10);
             }
             //System.out.println(canditateWords);
             
@@ -42,7 +42,7 @@ public class SpellCorrector {
                                             * (cr.getSmoothedCount(entry.getKey() + " " + words[i+1]) / cr.getSmoothedCount(entry.getKey())));
                 double channel = Math.log10(entry.getValue());
                 double probability = channel + prior;
-                System.out.println(probability + " " + entry.getKey() + " " + words[i- 1] + " " + channel + " " + prior);
+                //System.out.println(probability + " " + words[i-1] + " " + entry.getKey() + " " + words[i+1] + " " + channel + " " + prior);
                 
                 if(probability > maxProbability) {
                     maxProbability = probability;
