@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="SpellChecker">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/SpellChecker.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

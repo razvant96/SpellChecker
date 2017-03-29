@@ -148,7 +148,17 @@ public class CorpusReader
     public boolean inVocabulary(String word) 
     {
        return vocabulary.contains(word);
-    }    
+    }
+
+    /**
+     * returns biChars value
+     * 
+     * @param chars the two chars
+     * @return 
+     */
+    public int getBiCharsValue(String chars) {
+        return biChars.get(chars);
+    }
     
     public double getSmoothedCount(String NGram)
     {

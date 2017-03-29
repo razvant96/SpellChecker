@@ -21,7 +21,6 @@ public class SpellCorrector {
             
         String[] words = phrase.split(" ");
         String finalSuggestion = "";
-        /** CODE TO BE ADDED **/
         
         int nrOfMistakes = 0;
         int i;
@@ -33,13 +32,12 @@ public class SpellCorrector {
             double maxProbability = (double) Double.NEGATIVE_INFINITY;
             String correctWord = "";
             if(cr.inVocabulary(words[i])) {
-                canditateWords.put(words[i], 0.10);
+                canditateWords.put(words[i], 0.95);
             }
-            //System.out.println(canditateWords);
             
             for(Map.Entry<String,Double> entry : canditateWords.entrySet()){
-                double prior = Math.log10((cr.getSmoothedCount(words[i-1] + " " + entry.getKey()) / cr.getSmoothedCount(words[i-1]))
-                                            * (cr.getSmoothedCount(entry.getKey() + " " + words[i+1]) / cr.getSmoothedCount(entry.getKey())));
+                double prior = Math.log10(cr.getSmoothedCount(words[i-1] + " " + entry.getKey()) / cr.getSmoothedCount(words[i-1]))
+                                            + Math.log10(cr.getSmoothedCount(entry.getKey() + " " + words[i+1]) / cr.getSmoothedCount(entry.getKey()));
                 double channel = Math.log10(entry.getValue());
                 double probability = channel + prior;
                 //System.out.println(probability + " " + words[i-1] + " " + entry.getKey() + " " + words[i+1] + " " + channel + " " + prior);

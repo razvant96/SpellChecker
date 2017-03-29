@@ -30,8 +30,9 @@ public class SpellChecker {
                 "at the hme locations there were traces of water",
                 "this assay allowed us to measure a wide variety of conditions",
                 "this assay allowed us to measure a wide variety of conitions",
-                "this assay allowed us to meassure a wide variety of conditions",
-                "the development of diabetes is present in moce that carry a transgen"
+                "this assay allowed us to meassure a wide variety of conitions",
+                "the development of diabetes is present in moce that carry a transgen",
+                "the development of diabetes us present in mice that harry a transgen"
             };
             
             for(String sentence: sentences) {
