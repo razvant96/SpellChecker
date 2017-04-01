@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class CorpusReader 
@@ -169,20 +170,73 @@ public class CorpusReader
         
         double smoothedCount = 0.0;
         
-        if(!NGram.contains(" ")) { //unigram
-            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (getCorpusSize() + getVocabularySize()) * getCorpusSize(); 
-            // to get count multiply by getCorpusSize() or N = number of tokens
+        if(!NGram.contains(" ")) { //uniGram
+            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (getCorpusSize() + getVocabularySize()) * getCorpusSize();
         }
-        else { //bigram
+        else { //biGram
             String s1;
             int j = NGram.indexOf(" ");
 
             s1 = NGram.substring(0, j);
-            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (getSmoothedCount(s1) + getVocabularySize()) * getSmoothedCount(s1); 
-                                                                            // to get count multiply by getNGramCount(s1)
-                                                         //possibly use getSmoothedCount(s1)                               here too maybe
+            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (getSmoothedCount(s1) + getVocabularySize()) * getSmoothedCount(s1);
         }
         
         return smoothedCount;        
+    }
+    public double getKneserNaySmoothingCount(String NGram) {
+        if(NGram == null || NGram.length() == 0)
+        {
+            throw new IllegalArgumentException("NGram must be non-empty.");
+        }
+
+        double smoothedCount = 0.0;
+        double lambda = 0.0;
+        double distribution = 0.75;
+
+        if(!NGram.contains(" ")) { //uniGram
+            lambda = getLambda("", distribution);
+            smoothedCount = (Math.max((getNGramCount(NGram) - distribution), 0.0) / getCorpusSize()) + lambda / getVocabularySize();
+        }
+        else { //biGram
+            String s1;
+            String s2;
+            int j = NGram.indexOf(" ");
+
+            s1 = NGram.substring(0, j);
+            s2 = NGram.substring(j+1, NGram.length());
+            lambda = getLambda(s1, distribution);
+            smoothedCount = (Math.max((getNGramCount(NGram) - distribution), 0.0) / getKneserNaySmoothingCount(s1)) + lambda * continuationProb(s2);
+        }
+
+        return smoothedCount;
+    }
+    private double getLambda(String word, double distribution) {
+        if(word.equals("")) {
+            return distribution / getCorpusSize() * getVocabularySize();
+        }
+        else {
+            int previousWordCounter = 0;
+            for(Map.Entry<String, Integer> ngram : ngrams.entrySet()) {
+                if(ngram.getKey().contains(" ")) {
+                    int j = ngram.getKey().indexOf(" ");
+                    String previousWord = ngram.getKey().substring(0, j);
+                    if(previousWord == word) {
+                        previousWordCounter += ngram.getValue();
+                    }
+                }
+            }
+            return distribution * biGram1.get(word) / previousWordCounter;
+        }
+    }
+    private double continuationProb(String word) {
+        int total = 0;
+        int continuationCount = 0;
+        for(Map.Entry<String, Integer> bigram : biGram2.entrySet()) {
+            total += bigram.getValue();
+            if(bigram.getKey().equals(word)) {
+                continuationCount = bigram.getValue();
+            }
+        }
+        return (double) continuationCount / total;
     }
 }
