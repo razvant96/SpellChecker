@@ -58,10 +58,12 @@ public class SpellCorrector {
             for(Map.Entry<String,Double> entry : canditateWords.entrySet()){
                 // get the prior probability(or language model probability) in logarithm
                 // we are using biGram probabilities with the previous and next word
-                double prior = Math.log10(cr.getSmoothedCount(words[i-1] + " " + entry.getKey())
+                /*double prior = Math.log10(cr.getSmoothedCount(words[i-1] + " " + entry.getKey())
                                 / cr.getSmoothedCount(words[i-1]))
                                     + Math.log10(cr.getSmoothedCount(entry.getKey() + " " + words[i+1])
-                                        / cr.getSmoothedCount(entry.getKey()));
+                                        / cr.getSmoothedCount(entry.getKey()));*/
+                double prior = Math.log10(cr.getKneserNaySmoothingCount(words[i-1] + " " + entry.getKey()))
+                        + Math.log10(cr.getKneserNaySmoothingCount(entry.getKey() + " " + words[i+1]));
                 // get the channel probability in logarithm
                 double channel = Math.log10(entry.getValue());
                 // add the two together to get the final probability for this candidate word

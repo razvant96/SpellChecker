@@ -191,11 +191,14 @@ public class CorpusReader
 
         double smoothedCount = 0.0;
         double lambda = 0.0;
+        double distribution2 = 0.5;
         double distribution = 0.75;
 
+
         if(!NGram.contains(" ")) { //uniGram
-            lambda = getLambda("", distribution);
-            smoothedCount = (Math.max((getNGramCount(NGram) - distribution), 0.0) / getCorpusSize()) + lambda / getVocabularySize();
+            lambda = getLambda("", distribution2);
+
+            smoothedCount = ((getNGramCount(NGram) - distribution2) / getCorpusSize()) + lambda / getVocabularySize();
         }
         else { //biGram
             String s1;
@@ -205,7 +208,8 @@ public class CorpusReader
             s1 = NGram.substring(0, j);
             s2 = NGram.substring(j+1, NGram.length());
             lambda = getLambda(s1, distribution);
-            smoothedCount = (Math.max((getNGramCount(NGram) - distribution), 0.0) / getKneserNaySmoothingCount(s1)) + lambda * continuationProb(s2);
+            //smoothedCount = ((getNGramCount(NGram) - distribution) / getNGramCount(s1)) + lambda * getKneserNaySmoothingCount(s2);
+            //smoothedCount = (Math.max((getNGramCount(NGram) - distribution), 0.0) / getNGramCount(s1)) + lambda * continuationProb(s2);
         }
 
         return smoothedCount;
@@ -225,7 +229,7 @@ public class CorpusReader
                     }
                 }
             }
-            return distribution * biGram1.get(word) / previousWordCounter;
+            return distribution * biGram1.getOrDefault(word, 0) / previousWordCounter;
         }
     }
     private double continuationProb(String word) {
