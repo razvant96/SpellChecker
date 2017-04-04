@@ -227,28 +227,27 @@ public class CorpusReader
         }
         else {
             double previousWordCounter = 0.0;
-            /*for(Map.Entry<String, Integer> ngram : ngrams.entrySet()) {
+            for(Map.Entry<String, Integer> ngram : ngrams.entrySet()) {
                 if(ngram.getKey().contains(" ")) {
                     int j = ngram.getKey().indexOf(" ");
                     String previousWord = ngram.getKey().substring(0, j);
-                    if(previousWord == word) {
+                    if(previousWord.equals(word)) {
                         previousWordCounter += ngram.getValue();
                     }
                 }
-            }*/
-            double x = getNGramCount(word);
-            return distribution * biGram1.getOrDefault(word, 0) / x;
+            }
+            double lambda = distribution * biGram1.getOrDefault(word, 0);
+            if(lambda != 0) {
+                return distribution * biGram1.getOrDefault(word, 0) / previousWordCounter;
+            }
+            else{
+                return distribution/ getNGramCount(word);
+            }
         }
     }
     private double continuationProb(String word) {
-        double total = 0;
-        double continuationCount = 0;
-        /*for(Map.Entry<String, Integer> bigram : biGram2.entrySet()) {
-            total += bigram.getValue();
-            if(bigram.getKey().equals(word)) {
-                continuationCount = bigram.getValue();
-            }
-        }*/
+        //double total = 0;
+        double continuationCount;
         continuationCount = biGram2.getOrDefault(word,0);
         double x = biGramCount;
         return continuationCount / x;

@@ -30,6 +30,8 @@ public class SpellCorrector {
         
         int nrOfMistakes = 0; //the number of mistakes found so far
         int i; // initialize i here to use it later
+        double lambdaBi = 0.7;
+        double lambdaUni = 0.3;
 
         // iterate over the actual words in the phrase
         //  without SoS and EoS
@@ -58,17 +60,15 @@ public class SpellCorrector {
             for(Map.Entry<String,Double> entry : canditateWords.entrySet()){
                 // get the prior probability(or language model probability) in logarithm
                 // we are using biGram probabilities with the previous and next word
-                /*double prior = Math.log10(cr.getSmoothedCount(words[i-1] + " " + entry.getKey())
-                                / cr.getSmoothedCount(words[i-1]))
-                                    + Math.log10(cr.getSmoothedCount(entry.getKey() + " " + words[i+1])
-                                        / cr.getSmoothedCount(entry.getKey()));*/
-                double prior = Math.log10(cr.getKneserNaySmoothingCount(words[i-1] + " " + entry.getKey()))
-                        /*+ Math.log10(cr.getKneserNaySmoothingCount(entry.getKey() + " " + words[i+1]))*/;
+                double prior = Math.log10(lambdaBi * cr.getKneserNaySmoothingCount(words[i-1] + " " + entry.getKey())) +
+                                    Math.log(lambdaUni * cr.getKneserNaySmoothingCount(entry.getKey()));
+                //double prior = Math.log10(cr.getKneserNaySmoothingCount(words[i-1] + " " + entry.getKey()))
+                        //+ Math.log10(cr.getKneserNaySmoothingCount(entry.getKey() + " " + words[i+1]));
                 // get the channel probability in logarithm
                 double channel = Math.log10(entry.getValue());
                 // add the two together to get the final probability for this candidate word
                 double probability = channel + prior;
-                //System.out.println(probability + " " + words[i-1] + " " + entry.getKey() + " " + words[i+1] + " " + channel + " " + prior);
+                //System.out.println(probability + " " + words[i-1] + " " + entry.getKey() + " " + channel + " " + prior);
 
                 // if we found a better probability update max probability and the correct word
                 if(probability > maxProbability) {
@@ -80,7 +80,7 @@ public class SpellCorrector {
             //add the correct word to the final phrase
             finalSuggestion = finalSuggestion + " " + correctWord;
             /*
-             * if the correct word is found is not equal to the initial word
+             * if the correct word found is not equal to the initial word
              * that means that we have found a mistake so we increment nrOfMistakes
              * and also increment i to skip past the next word since we now for sure
              * that is not a mistake and append the next word to the final suggestion

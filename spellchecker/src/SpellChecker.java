@@ -8,7 +8,7 @@ public class SpellChecker {
      */
     public static void main(String[] args) 
     {
-        boolean inPeach = false; // set this to true if you submit to peach!!
+        boolean inPeach = true; // set this to true if you submit to peach!!
         
         try {
             CorpusReader cr = new CorpusReader();
@@ -27,16 +27,17 @@ public class SpellChecker {
     
     static void nonPeachTest(SpellCorrector sc) throws IOException { 
             String[] sentences = {
-                "at the hme locations there were traces of water",
-                "at the hoome locations there were traces of water",
-                "at the home locasions there were traces of water",
-                "this assay allowed us to measure a wide variety of conditions",
-                "this assay allowed us to measure a wide variety of conitions",
-                "this assay allowed us to meassure a wide variety of conitions",
-                "this assay allowed us to measure a wide vareity of conditions",
-                "the development of diabetes is present in moce that carry a transgen",
-                "the development of idabetes is present in mice that carry a transgen",
-                "the development of diabetes us present in mice that harry a transgen"
+                //"at the hme locations there were traces of water",
+                //"at the hoome locations there were traces of water",
+                //"at the home locasions there were traces of water",
+                //"this assay allowed us to measure a wide variety of conditions",
+                //"this assay allowed us to measure a wide variety of conitions",
+                //"this assay allowed us to meassure a wide variety of conitions",
+                //"this assay allowed us to measure a wide vareity of conditions",
+                //"the development of diabetes is present in moce that carry a transgen",
+                //"the development of idabetes is present in mice that carry a transgen",
+                "the development of diabetes us present in mice that harry a transgen",
+                    "she still refers to me has a friend but i fel i am treated quite badly"
             };
             
             for(String sentence: sentences) {
