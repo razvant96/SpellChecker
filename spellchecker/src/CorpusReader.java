@@ -206,11 +206,14 @@ public class CorpusReader
         return smoothedCount;
     }
     private double getLambda(String word, double distribution) {
-        if(word.equals("")) {
+        
+        if(word.equals("")) {//special case for empty string
             return distribution / getCorpusSize() * getVocabularySize();
         }
         else {
             double previousWordCounter = 0.0;
+            //compute the sum of the counts of the bigrams where
+            //the first word is the word from the input
             for(Map.Entry<String, Integer> ngram : ngrams.entrySet()) {
                 if(ngram.getKey().contains(" ")) {
                     int j = ngram.getKey().indexOf(" ");
@@ -222,9 +225,12 @@ public class CorpusReader
             }
             double lambda = distribution * biGram1.getOrDefault(word, 0);
             if(lambda != 0) {
+                
                 return distribution * biGram1.getOrDefault(word, 0) / previousWordCounter;
             }
             else{
+                //special case if lambda as usually computed 
+                //can be 0
                 return distribution/ getNGramCount(word);
             }
         }
