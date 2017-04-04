@@ -63,7 +63,7 @@ public class SpellCorrector {
                                     + Math.log10(cr.getSmoothedCount(entry.getKey() + " " + words[i+1])
                                         / cr.getSmoothedCount(entry.getKey()));*/
                 double prior = Math.log10(cr.getKneserNaySmoothingCount(words[i-1] + " " + entry.getKey()))
-                        + Math.log10(cr.getKneserNaySmoothingCount(entry.getKey() + " " + words[i+1]));
+                        /*+ Math.log10(cr.getKneserNaySmoothingCount(entry.getKey() + " " + words[i+1]))*/;
                 // get the channel probability in logarithm
                 double channel = Math.log10(entry.getValue());
                 // add the two together to get the final probability for this candidate word

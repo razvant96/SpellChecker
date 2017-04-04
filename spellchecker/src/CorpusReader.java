@@ -191,9 +191,16 @@ public class CorpusReader
 
         double smoothedCount = 0.0;
         double lambda = 0.0;
-        double distribution2 = 0.5;
+        double distribution2 = 0.75;
         double distribution = 0.75;
-
+        if(getNGramCount(NGram) == 1){
+            distribution = 0.5;
+            distribution2 = 0.5;
+        }
+        if(getNGramCount(NGram) == 2){
+            distribution = 0.65;
+            distribution2 = 0.65;
+        }
 
         if(!NGram.contains(" ")) { //uniGram
             lambda = getLambda("", distribution2);
@@ -209,7 +216,7 @@ public class CorpusReader
             s2 = NGram.substring(j+1, NGram.length());
             lambda = getLambda(s1, distribution);
             //smoothedCount = ((getNGramCount(NGram) - distribution) / getNGramCount(s1)) + lambda * getKneserNaySmoothingCount(s2);
-            //smoothedCount = (Math.max((getNGramCount(NGram) - distribution), 0.0) / getNGramCount(s1)) + lambda * continuationProb(s2);
+            smoothedCount = (Math.max((getNGramCount(NGram) - distribution), 0.0) / getNGramCount(s1)) + lambda * continuationProb(s2);
         }
 
         return smoothedCount;
@@ -219,8 +226,8 @@ public class CorpusReader
             return distribution / getCorpusSize() * getVocabularySize();
         }
         else {
-            int previousWordCounter = 0;
-            for(Map.Entry<String, Integer> ngram : ngrams.entrySet()) {
+            double previousWordCounter = 0.0;
+            /*for(Map.Entry<String, Integer> ngram : ngrams.entrySet()) {
                 if(ngram.getKey().contains(" ")) {
                     int j = ngram.getKey().indexOf(" ");
                     String previousWord = ngram.getKey().substring(0, j);
@@ -228,19 +235,22 @@ public class CorpusReader
                         previousWordCounter += ngram.getValue();
                     }
                 }
-            }
-            return distribution * biGram1.getOrDefault(word, 0) / previousWordCounter;
+            }*/
+            double x = getNGramCount(word);
+            return distribution * biGram1.getOrDefault(word, 0) / x;
         }
     }
     private double continuationProb(String word) {
-        int total = 0;
-        int continuationCount = 0;
-        for(Map.Entry<String, Integer> bigram : biGram2.entrySet()) {
+        double total = 0;
+        double continuationCount = 0;
+        /*for(Map.Entry<String, Integer> bigram : biGram2.entrySet()) {
             total += bigram.getValue();
             if(bigram.getKey().equals(word)) {
                 continuationCount = bigram.getValue();
             }
-        }
-        return (double) continuationCount / total;
+        }*/
+        continuationCount = biGram2.getOrDefault(word,0);
+        double x = biGramCount;
+        return continuationCount / x;
     }
 }

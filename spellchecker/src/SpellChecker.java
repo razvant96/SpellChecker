@@ -8,7 +8,7 @@ public class SpellChecker {
      */
     public static void main(String[] args) 
     {
-        boolean inPeach = false; // set this to true if you submit to peach!!!
+        boolean inPeach = false; // set this to true if you submit to peach!!
         
         try {
             CorpusReader cr = new CorpusReader();
@@ -50,6 +50,8 @@ public class SpellChecker {
     static void peachTest(SpellCorrector sc) throws IOException {
             Scanner input = new Scanner(System.in);
             String sentence = input.nextLine();
-            System.out.println("Answer: " + sc.correctPhrase(sentence));  
+            //System.out.println("Input : " + sentence);
+            System.out.println("Answer: " + sc.correctPhrase(sentence)); 
+            //System.out.println();
     } 
 }
