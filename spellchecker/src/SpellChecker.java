@@ -37,7 +37,10 @@ public class SpellChecker {
                 //"the development of diabetes is present in moce that carry a transgen",
                 //"the development of idabetes is present in mice that carry a transgen",
                 "the development of diabetes us present in mice that harry a transgen",
-                    "she still refers to me has a friend but i fel i am treated quite badly"
+                    "she still refers to me has a friend but i fel i am treated quite badly",
+                    "boxing glowes shield the knockles not the head",
+                    "boxing loves shield the knuckles nots the head",
+                    "this advise is taking into consideration the fact that the govenrment bans"
             };
             
             for(String sentence: sentences) {

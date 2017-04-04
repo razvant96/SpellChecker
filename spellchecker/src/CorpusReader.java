@@ -161,28 +161,7 @@ public class CorpusReader
         return biChars.get(chars);
     }
     
-    public double getSmoothedCount(String NGram)
-    {
-        if(NGram == null || NGram.length() == 0)
-        {
-            throw new IllegalArgumentException("NGram must be non-empty.");
-        }
-        
-        double smoothedCount = 0.0;
-        
-        if(!NGram.contains(" ")) { //uniGram
-            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (getCorpusSize() + getVocabularySize()) * getCorpusSize();
-        }
-        else { //biGram
-            String s1;
-            int j = NGram.indexOf(" ");
-
-            s1 = NGram.substring(0, j);
-            smoothedCount = ((double) (getNGramCount(NGram) + 1)) / (getSmoothedCount(s1) + getVocabularySize()) * getSmoothedCount(s1);
-        }
-        
-        return smoothedCount;        
-    }
+    
     public double getKneserNaySmoothingCount(String NGram) {
         if(NGram == null || NGram.length() == 0)
         {
@@ -191,8 +170,11 @@ public class CorpusReader
 
         double smoothedCount = 0.0;
         double lambda = 0.0;
+        //initialize the discounts
         double distribution2 = 0.75;
         double distribution = 0.75;
+        
+        //change discounts for low counts
         if(getNGramCount(NGram) == 1){
             distribution = 0.5;
             distribution2 = 0.5;
@@ -211,11 +193,13 @@ public class CorpusReader
             String s1;
             String s2;
             int j = NGram.indexOf(" ");
-
+            
+            //get the first and second word
             s1 = NGram.substring(0, j);
             s2 = NGram.substring(j+1, NGram.length());
             lambda = getLambda(s1, distribution);
-            //smoothedCount = ((getNGramCount(NGram) - distribution) / getNGramCount(s1)) + lambda * getKneserNaySmoothingCount(s2);
+            
+            //compute smoothed count
             smoothedCount = (Math.max((getNGramCount(NGram) - distribution), 0.0) / getNGramCount(s1)) + lambda * continuationProb(s2);
         }
 

@@ -32,6 +32,7 @@ public class SpellCorrector {
         int i; // initialize i here to use it later
         double lambdaBi = 0.7;
         double lambdaUni = 0.3;
+        double lambda  = 0.5;
 
         // iterate over the actual words in the phrase
         //  without SoS and EoS
@@ -60,15 +61,15 @@ public class SpellCorrector {
             for(Map.Entry<String,Double> entry : canditateWords.entrySet()){
                 // get the prior probability(or language model probability) in logarithm
                 // we are using biGram probabilities with the previous and next word
-                double prior = Math.log10(lambdaBi * cr.getKneserNaySmoothingCount(words[i-1] + " " + entry.getKey())) +
-                                    Math.log(lambdaUni * cr.getKneserNaySmoothingCount(entry.getKey()));
+                double prior = Math.log10(lambdaBi * cr.getKneserNaySmoothingCount(words[i-1] + " " + entry.getKey()) + // +
+                                    lambdaUni * cr.getKneserNaySmoothingCount(entry.getKey()));
                 //double prior = Math.log10(cr.getKneserNaySmoothingCount(words[i-1] + " " + entry.getKey()))
                         //+ Math.log10(cr.getKneserNaySmoothingCount(entry.getKey() + " " + words[i+1]));
                 // get the channel probability in logarithm
-                double channel = Math.log10(entry.getValue());
+                double channel = lambda *Math.log10(entry.getValue());
                 // add the two together to get the final probability for this candidate word
                 double probability = channel + prior;
-                //System.out.println(probability + " " + words[i-1] + " " + entry.getKey() + " " + channel + " " + prior);
+                
 
                 // if we found a better probability update max probability and the correct word
                 if(probability > maxProbability) {
